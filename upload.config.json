@@ -1,0 +1,84 @@
+{
+  "plugin": {
+    "summary": {
+      "description": "Detects features within images using AI.",
+      "icon": "VideoResize"
+    },
+    "parameters": {
+      "schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "title": "Image AI",
+        "type": "object"
+      },
+      "ui": {}
+    }
+  },
+  "templates": {
+    "extract": {
+      "summary": {
+        "name": "AI image detection",
+        "description": "Automatically detects keywords within an image.",
+        "category": "image",
+        "icon": "VideoResize",
+        "promoted": false
+      },
+      "transformation": {
+        "description": {
+          "ref": "join('', ['Detects an image\\'s first ', to_string(maxKeywords),' keywords with a confidence score over ', to_string(minConfidence), '%.'])"
+        },
+        "scope": {
+          "mime": ["*"],
+          "tag": ["*"]
+        },
+        "slug": "ai-image-keywords",
+        "steps": [
+          {
+            "plugin": {
+              "packageName": "upload-image-ai-plugin",
+              "packageVersion": "1.0.0"
+            },
+            "params": {
+              "mode": "DetectKeywords",
+              "maxKeywords": {
+                "ref": "maxKeywords"
+              },
+              "minConfidence": {
+                "ref": "minConfidence"
+              }
+            }
+          }
+        ]
+      },
+      "transformationVariables": {
+        "schema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "maxKeywords": {
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Max Keywords",
+              "type": "integer",
+              "default": 20
+            },
+            "minConfidence": {
+              "maximum": 100,
+              "minimum": 1,
+              "title": "minConfidence",
+              "type": "number",
+              "default": 55
+            }
+          },
+          "required": ["maxKeywords", "minConfidence"]
+        },
+        "ui": {
+          "ui:order": ["maxKeywords", "minConfidence"],
+          "minConfidence": {
+            "ui:widget": "range"
+          }
+        }
+      }
+    }
+  }
+}
